@@ -9,8 +9,7 @@ import ru.kata.spring.boot_security.demo.entity.Role;
 import ru.kata.spring.boot_security.demo.entity.User;
 import ru.kata.spring.boot_security.demo.service.UserService;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Collections;
 
 @Controller
 @PreAuthorize("hasAuthority('ADMIN')")
@@ -25,8 +24,7 @@ public class AdminController {
 
     @GetMapping
     public String showAllUsers(Model model) {
-        List<User> userList = service.listUsers();
-        model.addAttribute("userList", userList);
+        model.addAttribute("userList", service.listUsers());
         return "all-users";
     }
 
@@ -38,8 +36,7 @@ public class AdminController {
 
     @PostMapping("/updateInfo")
     public String getUser(@RequestParam Long id, Model model) {
-        User user = service.getUser(id);
-        model.addAttribute("user", user);
+        model.addAttribute("user", service.getUser(id));
         model.addAttribute("roles", Role.values());
         return "user-info";
     }
@@ -53,25 +50,8 @@ public class AdminController {
         return "user-info";
     }
 
-    //Тут принимаются все поля формы в виде мапы, вынимается оттуда сет ключей (имен полей формы)
-    //и сравнивается с содержимым сета из всех существующих ролей Role.values().
-    //если есть совпадающий элемент в обоих списках, значит это отмеченная во view роль,
-    //которую мы добавляем пользователю
     @PostMapping("/save-user")
-    public String saveUser(@ModelAttribute("user") User user, @RequestParam Map<String, String> form) {
-        Set<Role> roleSet = new HashSet<>();
-
-        Collection<String> allRolesAsString = Arrays.stream(Role.values())
-                .map(Enum::name)
-                .collect(Collectors.toSet());
-
-        for (String field : form.keySet()) {
-            if (allRolesAsString.contains(field)) {
-                Role role = Role.valueOf(field);
-                roleSet.add(role);
-            }
-        }
-        user.setRoles(roleSet);
+    public String saveUser(@ModelAttribute("user") User user) {
         service.saveOrUpdate(user);
         return "redirect:/admin";
     }

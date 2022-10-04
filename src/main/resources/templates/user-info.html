@@ -19,9 +19,16 @@
         <br> Country:
         <input type="text" th:value="*{country}" name="country">
         <br> Roles:
-        <div th:each="role : ${roles}">
-            <input type="checkbox" th:name="${role}" th:checked="${#arrays.contains(user.roles, role)}">
-            <label th:text="${role}"></label>
+        <!--        <div th:each="role : ${roles}">-->
+        <!--            <input type="checkbox" th:name="${role}" th:checked="${#arrays.contains(user.roles, role)}">-->
+        <!--            <label th:text="${role}"></label>-->
+        <!--        </div>-->
+        <div>
+            <label>Roles</label>
+            <select name="roles" required multiple size="2">
+                <option th:each="role : ${roles}" th:value="${role}" th:text="${role}"
+                        th:selected="${#arrays.contains(user.roles, role)}"></option>
+            </select>
         </div>
         <input type="hidden" th:value="*{id}" name="id">
         <button type="submit">Save</button>
